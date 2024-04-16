@@ -42,26 +42,26 @@ class ProjectFactory:
         issues = project.get_issues()
         logger.debug("Have to process %d issues." % len(issues))
         # build lookup
-        fpr.Audit.build_issue_analysis_lookup()
+        #fpr.Audit.build_issue_analysis_lookup()
         for issueid in issues:
 
             i = project.get_issue(issueid)
-            analysisInfo = fpr.Audit.get_issue_analysis(issueid)
+            #analysisInfo = fpr.Audit.get_issue_analysis(issueid)
 
-            if analysisInfo is not None:
-                # set suppressed status
-                i.suppressed = analysisInfo['suppressed']
-                if analysisInfo['analysis'] is not None:
-                    i.analysis = analysisInfo['analysis']
+            #if analysisInfo is not None:
+            #    # set suppressed status
+            #    i.suppressed = analysisInfo['suppressed']
+            #    if analysisInfo['analysis'] is not None:
+            #        i.analysis = analysisInfo['analysis']
 
             project.add_or_update_issue(i)  # add it back in to replace the previous one
 
         # now, add information about removed issues
         logger.debug("Getting information about removed issues")
-        if hasattr(fpr.Audit, 'IssueList') and hasattr(fpr.Audit.IssueList, 'RemovedIssue'):
-            for removed in fpr.Audit.IssueList.RemovedIssue:
-                ri = RemovedIssue.from_auditxml(removed)
-                project.add_or_update_issue(ri)
+        #if hasattr(fpr.Audit, 'IssueList') and hasattr(fpr.Audit.IssueList, 'RemovedIssue'):
+        #    for removed in fpr.Audit.IssueList.RemovedIssue:
+        #        ri = RemovedIssue.from_auditxml(removed)
+        #        project.add_or_update_issue(ri)
 
         removedissues = [i for i in list(issues.values()) if i.removed]
         suppressedissues = [i for i in list(issues.values()) if i.suppressed]
@@ -78,15 +78,15 @@ class Project:
         self._issues = {}
 
         # set project properties
-        if hasattr(fpr.Audit.ProjectInfo, 'Name'):
-            self.ProjectName=fpr.Audit.ProjectInfo.Name
-        else:
-            self.ProjectName=None
+        #if hasattr(fpr.Audit.ProjectInfo, 'Name'):
+        #    self.ProjectName=fpr.Audit.ProjectInfo.Name
+        #else:
+        self.ProjectName=None
 
-        if hasattr(fpr.Audit.ProjectInfo, 'ProjectVersionId'):
-            self.ProjectVersionId=fpr.Audit.ProjectInfo.ProjectVersionId
-        else:
-            self.ProjectVersionId=None
+        #if hasattr(fpr.Audit.ProjectInfo, 'ProjectVersionId'):
+        #    self.ProjectVersionId=fpr.Audit.ProjectInfo.ProjectVersionId
+        #else:
+        self.ProjectVersionId=None
 
         for loc in fpr.FVDL.Build.LOC:
             if loc.attrib['type'] == 'Fortify':
@@ -138,7 +138,7 @@ class Project:
         for i in self._issues.values():
             if not open_high_priority or i.is_open_high_priority:
                 print("%s:%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s" % \
-                      (i.metadata['shortfile'], i.metadata['line'], i.metadata['file'], i.id, i.kingdom, i.category, i.risk, i.is_NAI(), "H" if i.hidden else "V", i.suppressed, i.removed, i.analysis))
+                      (i.metadata['shortfile'], i.metadata['line'], i.metadata.get('file'), i.id, i.kingdom, i.category, i.risk, i.is_NAI(), "H" if i.hidden else "V", i.suppressed, i.removed, i.analysis))
 
     def get_fpr(self):
         return self._fpr
